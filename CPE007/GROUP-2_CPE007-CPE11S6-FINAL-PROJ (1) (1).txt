@@ -1,0 +1,361 @@
+TECHNOLOGICAL INSTITUTE OF THE PHILIPPINES
+      Quezon City BACHELOR OF SCIENCE
+Computer Engineering
+
+
+
+
+CPE 007-CPE11S6 FINAL PROJECT DOCUMENTATION
+Point-Of-Sale System Using C++
+
+Submitted By GROUP 2 Members:
+
+Acelejado, John Vince Costales, Raymark Paul Tankeko, Ma. Bea Angela Urbano, Vince Andrew
+
+
+
+
+
+
+
+
+
+Submitted To: Engr. Robin Valenzuela
+
+I. INTRODUCTION:
+
+A point-of-sale system is a place where a customer executes the payment for goods or services and where sales taxes may become payable. It is one of if not the cornerstone of any establishment offering various services or products to a variety of customers. A point-of-sale system also plays a vital role for inventory tracking, ensuring that an establishment is able to provide goods or services necessary to its customers.
+
+II. PROBLEM:
+
+Handwritten ordering systems take time and energy and can be proven slow and inefficient in certain establishments. Additionally, handwritten records are easily susceptible to wear and tear over time, making keeping inventory monitoring harder than it should be.
+
+III. OBJECTIVES:
+
+With the presented problem, the group aims to achieve the following:
+- Create a simple POS application using C++ that allows users to process sales, select products to process, and provides instant feedback through automatic billing
+- The application must also include a simple inventory system to allow users to keep track of item inventory to easily determine the availability of certain products to be purchased
+- The application must also allow processing of special discounts (PWD and Senior Discounts) which should be reflected in the application.
+
+IV. FLOWCHART OF THE SYSTEM
+
+
+V. PSEUDOCODE
+
+APPLICATION START
+Application Menu Selection Opens
+1. Select Inventory
+a. Program asks for admin password
+b. If password is correct:
+i. Program shows current available inventory
+c. If not, application denies entry, loops back to Menu selection
+2. Select Menu
+a. Program displays store menu
+b. If user enters numeric values 1-4 for item ID
+i. Application 'lists' order
+ii. Application calculates order price
+iii. Loops back to Store Menu to ask for more orders (if any)
+c. If user selects 5
+i. The program displays ordered items. Displays additional commands
+1. If user selects 1, user will be prompted to enter item ID and quantity to add
+2. If user selects 2, user will be prompted to enter item ID to remove
+3. If user selects 3, user will be prompted to enter item ID and desired quantity to change
+4. If user selects 4, user will proceed to checkout
+d. Application will ask if senior discount will be applied
+i. If user selects Y/Yes/yes, program will apply 20% discount to total price
+ii. If user selects N/No/no, program will proceed to calculate final receipt
+e. Application shows total of ordered items, loops back to Application Menu Selection.
+3. Exit
+a. Application closes
+APPLICATION END
+
+
+VI. DATA DICTIONARY
+
+
+
+StructureFieldsPurposeMenuItemid(int), name(string), price(double), stock(int)Represents the store menu for customersMenuItemInv(Similar to MenuItem)Tracks Inventory and updates with every successful transaction.OrderitemID(int), quantity(int)Store customer's ordered items
+
+
+VariableTypePurposeMenu[], inv[]ArrayStore menu and inventory dataorders[]ArrayProvides list of ordered itemsmenuSizeIntProvides number of available items in the menuorderCountintProvides the number of items orderedoptintApplication Menu OptionscashierstringStores cashier name to be displayed in the systemtotal, discountdoubleShows the total amount of all ordered items, and discounted values
+
+
+
+
+
+ConstantPurpose1196Admin password(can be changed when desired)5Number of menu items/Code to proceed to checkout20%Discount rate for seniors/pwd
+VII. CODE WITH PICTURES
+#include <iostream> #include <iomanip> #include <string> #include <ctime> using namespace std;
+
+struct MenuItem { int id;
+string name; double price; int stock;
+};
+
+struct MenuItemInv { int id;
+string name; double price; int stock;
+};
+
+struct Order { int itemID; int quantity;
+};
+
+void displayDateTime() { time_t now = time(0); char* dt = ctime(&now);
+cout << "Date & Time: " << dt;
+}
+
+void displayMenu(MenuItem menu[], int menuSize) {
+cout << "\n========== MENU =================\n";
+cout << left << setw(5) << "ID" << setw(20) << "Item" << right << setw(10) << "Price" << endl;
+
+cout << "
+for (int i = 0; i < menuSize; i++) {
+
+\n";
+
+
+
+endl;
+}
+
+cout << left << setw(5) << menu[i].id
+<< setw(20) << menu[i].name
+<< right << setw(3) << "?" << setw(7) << fixed << setprecision(2) << menu[i].price <<
+
+cout << "==================================\n";
+}
+
+void displayMenuInv(MenuItemInv Inv[], int menuSizeInv) {
+cout << "\n========== INVENTORY =====================\n";
+cout << left << setw(5) << "ID"
+<< setw(20) << "Item"
+<< right << setw(10) << "Price"
+
+<< right << setw(10) << "Stocks" << endl;
+cout << "	\n";
+
+for (int i = 0; i < menuSizeInv; i++) { cout << left << setw(5) << Inv[i].id
+<< setw(20) << Inv[i].name
+<< right << setw(3) << "?" << setw(7) << fixed << setprecision(2) << Inv[i].price
+<< right << setw(10) << Inv[i].stock << endl;
+}
+
+cout << "===========================================\n";
+}
+
+double calculateTotal(Order orders[], int orderCount, MenuItem menu[], int menuSize) { double total = 0;
+for (int i = 0; i < orderCount; i++) { int id = orders[i].itemID;
+int qty = orders[i].quantity;
+for (int j = 0; j < menuSize; j++) { if (menu[j].id == id) {
+total += menu[j].price * qty; break;
+}
+}
+}
+return total;
+}
+
+double applyDiscount(double total, bool isSenior, bool isPWD) { double discount = 0.0;
+if (isSenior || isPWD) discount = total * 0.20; return discount;
+}
+
+void printReceipt(string cashier, Order orders[], int orderCount, MenuItem menu[], int menuSize, double total, double discount) {
+cout << "\n\n======= RESTAURANT NAME =======\n";
+displayDateTime();
+cout << "Cashier: " << cashier << endl;
+cout << "	\n";
+cout << left << setw(20) << "Item" << setw(10) << "Qty" << setw(10) << "Price" << endl;
+cout << "	\n";
+
+for (int i = 0; i < orderCount; i++) { int id = orders[i].itemID;
+int qty = orders[i].quantity;
+for (int j = 0; j < menuSize; j++) { if (menu[j].id == id) {
+cout << left << setw(20) << menu[j].name
+<< setw(10) << qty
+<< "?" << fixed << setprecision(2) << menu[j].price * qty << endl;
+
+break;
+}
+}
+}
+
+cout << "	\n";
+cout << "Subtotal: ?" << fixed << setprecision(2) << total << endl; cout << "Discount: ?" << discount << endl;
+cout << "TOTAL: ?" << total - discount << endl;
+cout << "==================================\n";
+cout << "Thank you for dining with us!\n";
+}
+
+bool account() { int pass;
+cout << "Please enter your account password: "; cin >> pass;
+if (pass == 1196){
+cout << "Welcome Admin!" << endl; return true;
+} else {
+cout << "Incorrect password!" << endl; return false;
+}
+}
+
+void previewOrders(Order orders[], int &orderCount, MenuItem menu[], int menuSize, MenuItemInv inv[]) {
+while (true) {
+if (orderCount == 0) {
+cout << "\nNo items in the order.\n"; return;
+}
+
+cout << "\n======= ORDER PREVIEW =======\n";
+cout << left << setw(5) << "ID" << setw(20) << "Item" << setw(10) << "Qty" << endl; for (int i = 0; i < orderCount; i++) {
+int id = orders[i].itemID;
+       cout << left << setw(5) << id << setw(20) << menu[id].name << setw(10) << orders[i].quantity << endl;
+}
+cout << "=============================\n";
+
+int choice;
+    cout << "Do you want to edit the order? 1-Add Item 2-Remove Item 3-Change Quantity 4-Proceed to Checkout: ";
+cin >> choice;
+
+if (choice == 1) {
+int addID, addQty;
+cout << "Enter Item ID to add: ";
+
+cin >> addID;
+cout << "Enter Quantity: "; cin >> addQty;
+
+if (inv[addID].stock >= addQty) { orders[orderCount].itemID = addID; orders[orderCount].quantity = addQty; inv[addID].stock -= addQty; orderCount++;
+} else {
+cout << "Not enough stock!" << endl;
+}
+} else if (choice == 2) { int removeID;
+cout << "Enter Item ID to remove: "; cin >> removeID;
+
+bool found = false;
+for (int i = 0; i < orderCount; i++) {
+if (orders[i].itemID == removeID) { inv[removeID].stock += orders[i].quantity; for (int j = i; j < orderCount - 1; j++) {
+orders[j] = orders[j + 1];
+}
+orderCount--; found = true; break;
+}
+}
+if (!found) cout << "Item not in the order.\n";
+} else if (choice == 3) { int editID, newQty;
+cout << "Enter Item ID to change quantity: "; cin >> editID;
+cout << "Enter new Quantity: "; cin >> newQty;
+
+for (int i = 0; i < orderCount; i++) { if (orders[i].itemID == editID) {
+if (newQty <= inv[editID].stock + orders[i].quantity) { inv[editID].stock += orders[i].quantity; orders[i].quantity = newQty;
+inv[editID].stock -= newQty;
+} else {
+cout << "Not enough stock!\n";
+}
+break;
+}
+}
+} else if (choice == 4) { break;
+
+} else {
+cout << "Invalid choice!\n";
+}
+}
+}
+
+int main() {
+int menuSize = 5; MenuItemInv inv[5] = {
+{0, "Burger", 120.00, 100},
+{1, "Fries", 60.00, 100},
+{2, "Soda", 40.00, 100},
+{3, "Chicken Meal", 180.00, 100},
+{4, "Pasta", 150.00, 100}
+};
+
+MenuItem menu[5] = {
+{0, "Burger", 120.00, 100},
+{1, "Fries", 60.00, 100},
+{2, "Soda", 40.00, 100},
+{3, "Chicken Meal", 180.00, 100},
+{4, "Pasta", 150.00, 100}
+};
+
+int opt;
+string cashier = "John Doe"; Order orders[50];
+int orderCount = 0; int choice, qty;
+char seniorChoice, pwdChoice;
+bool isSenior = false, isPWD = false;
+
+cout << "======= RESTAURANT NAME POS SYSTEM =======\n";
+displayDateTime();
+
+while (true){
+    cout << "Select an option: \n1. Inventory(employee only) \n2. Menu \n3. Exit \nEnter a number: ";
+cin >> opt;
+
+if (opt == 1){ if(account()){
+displayMenuInv(inv, menuSize);
+}
+} else if(opt == 2){ displayMenu(menu, menuSize); orderCount = 0;
+
+while (true){
+cout << "\nEnter Item ID (5 to finish): "; cin >> choice;
+
+if (choice == 5) break;
+
+bool found = false;
+for (int i = 0; i < menuSize; i++) { if (inv[i].id == choice) {
+cout << "Enter Quantity: "; cin >> qty;
+if (inv[choice].stock >= qty) { orders[orderCount].itemID = choice; orders[orderCount].quantity = qty; inv[i].stock -= qty;
+orderCount++;
+} else {
+cout << "Sorry, not enough stock.\n";
+}
+found = true; break;
+}
+}
+if (!found) cout << "Invalid Item ID! Try again.\n";
+}
+
+if (orderCount == 0) {
+cout << "\nNo items ordered.\n";
+} else {
+previewOrders(orders, orderCount, menu, menuSize, inv);
+
+if (orderCount > 0) {
+double total = calculateTotal(orders, orderCount, menu, menuSize); cout << "\nIs the customer a Senior Citizen? (Y/N): ";
+cin >> seniorChoice;
+cout << "Is the customer a PWD? (Y/N): "; cin >> pwdChoice;
+
+if (toupper(seniorChoice) == 'Y') isSenior = true; if (toupper(pwdChoice) == 'Y') isPWD = true;
+
+double discount = applyDiscount(total, isSenior, isPWD); printReceipt(cashier, orders, orderCount, menu, menuSize, total, discount);
+} else {
+cout << "No items to checkout.\n";
+}
+}
+} else if(opt == 3){ break;
+} else{
+cout << "Invalid Number!" << endl;
+}
+}
+
+cout << "\nSystem Closed. Goodbye!\n";
+
+return 0;
+}
+
+Screenshots:
+
+
+
+
+
+
+ItemQtyPrice
+Burger Fries
+ft120. 00 P60.00Subtotal: ?180.00
+Discount: ffi .00
+TOTAl:	!"180. 00
+
+
+
+VIII. Software Specifications
+
+ComponentSpecificationOSWindows 10/11, Linux or macOSCompiler/IDEGCC, Code::Blocks, Dec-C++, or Visual StudioC++ VersionC++ 11 or higherLibraries<iostream>, <iomanip>, <string>, <ctime>
+IX. Hardware Specifications
+ComponentMinimumRecommendedProcessorIntel Pentium / AMDIntel Core i3 or HigherMemory(RAM)2GB4GB+Storage100MB free space500MB+Display800x6001366x768+Input/OutputKeyboard, MonitorKeyboard, POS printer
+OPTIONAL HARDWARE:
+- POS Receipt Printer
+- Barcode Scanner
+- Database (MYSQL/SQLite)
